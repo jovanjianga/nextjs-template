@@ -2,13 +2,13 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { NextAuthOptions } from "next-auth"
 import EmailProvider from "next-auth/providers/email"
 import GitHubProvider from "next-auth/providers/github"
-import { Client } from "postmark"
+import { Resend } from "resend"
 
 import { env } from "@/env.mjs"
 import { siteConfig } from "@/config/site"
 import { db } from "@/lib/db"
 
-const postmarkClient = new Client(env.POSTMARK_API_TOKEN)
+const resend = new Resend(env.RESEND_API_KEY)
 
 export const authOptions: NextAuthOptions = {
   // huh any! I know.
@@ -38,33 +38,38 @@ export const authOptions: NextAuthOptions = {
           },
         })
 
-        const templateId = user?.emailVerified
-          ? env.POSTMARK_SIGN_IN_TEMPLATE
-          : env.POSTMARK_ACTIVATION_TEMPLATE
-        if (!templateId) {
-          throw new Error("Missing template id")
-        }
+        const subject = user?.emailVerified
+          ? `Sign in to ${siteConfig.name}`
+          : `Welcome to ${siteConfig.name}! Please verify your email`
 
-        const result = await postmarkClient.sendEmailWithTemplate({
-          TemplateId: parseInt(templateId),
-          To: identifier,
-          From: provider.from as string,
-          TemplateModel: {
-            action_url: url,
-            product_name: siteConfig.name,
-          },
-          Headers: [
-            {
-              // Set this to prevent Gmail from threading emails.
-              // See https://stackoverflow.com/questions/23434110/force-emails-not-to-be-grouped-into-conversations/25435722.
-              Name: "X-Entity-Ref-ID",
-              Value: new Date().getTime() + "",
-            },
-          ],
+        const { error } = await resend.emails.send({
+          from: provider.from as string,
+          to: identifier,
+          subject,
+          html: `
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: sans-serif;">
+              <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">
+                ${user?.emailVerified ? `Sign in to ${siteConfig.name}` : `Welcome to ${siteConfig.name}!`}
+              </h1>
+              <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                ${user?.emailVerified 
+                  ? "Click the button below to sign in to your account." 
+                  : "Thanks for signing up! Click the button below to verify your email address."}
+              </p>
+              <a href="${url}" 
+                 style="display: inline-block; background-color: #000; color: #fff; padding: 12px 24px; 
+                        text-decoration: none; border-radius: 5px; font-size: 16px;">
+                ${user?.emailVerified ? "Sign In" : "Verify Email"}
+              </a>
+              <p style="color: #999; font-size: 14px; margin-top: 20px;">
+                If you didn't request this email, you can safely ignore it.
+              </p>
+            </div>
+          `,
         })
 
-        if (result.ErrorCode) {
-          throw new Error(result.Message)
+        if (error) {
+          throw new Error(error.message)
         }
       },
     }),
