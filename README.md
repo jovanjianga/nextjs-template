@@ -1,90 +1,173 @@
-# Taxonomy
+# Next.js SaaS Template
 
-An open source application built using the new router, server components and everything new in Next.js 13.
+一个现代化的全栈 Next.js 模板，包含用户认证、订阅支付和仪表盘功能，可用于快速开发 SaaS 应用或业务网站。
 
-> **Warning**
-> This app is a work in progress. I'm building this in public. You can follow the progress on Twitter [@shadcn](https://twitter.com/shadcn).
-> See the roadmap below.
+## ✨ 功能特性
 
-## About this project
+- 🔐 **用户认证** - 基于 NextAuth.js 的完整认证系统（支持 GitHub OAuth）
+- 💳 **订阅支付** - 集成 Stripe 支付，支持免费和付费订阅计划
+- 📊 **仪表盘** - 用户仪表盘，包含账户管理和订阅管理
+- ⚙️ **个人设置** - 用户资料设置页面
+- 🎨 **UI 组件库** - 基于 Radix UI + Tailwind CSS 的精美组件
+- 🌓 **深色模式** - 支持系统主题切换
+- 📱 **响应式设计** - 完美适配移动端和桌面端
+- 🔒 **中间件保护** - 路由级别的认证保护
 
-This project as an experiment to see how a modern app (with features like authentication, subscriptions, API routes, static pages for docs ...etc) would work in Next.js 13 and server components.
+## 🛠️ 技术栈
 
-**This is not a starter template.**
+- **框架**: [Next.js 13](https://nextjs.org/) (App Router)
+- **语言**: [TypeScript](https://www.typescriptlang.org/)
+- **样式**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI 组件**: [Radix UI](https://www.radix-ui.com/)
+- **数据库**: [Prisma](https://www.prisma.io/) + MySQL
+- **认证**: [NextAuth.js](https://next-auth.js.org/)
+- **支付**: [Stripe](https://stripe.com/)
+- **表单验证**: [Zod](https://zod.dev/) + [React Hook Form](https://react-hook-form.com/)
 
-A few people have asked me to turn this into a starter. I think we could do that once the new features are out of beta.
+## 📁 项目结构
 
-## Note on Performance
+```
+├── app/                    # Next.js App Router 目录
+│   ├── (auth)/            # 认证相关页面 (登录、注册)
+│   ├── (dashboard)/       # 仪表盘相关页面
+│   ├── (marketing)/       # 营销页面 (首页、定价)
+│   └── api/               # API 路由
+├── components/            # React 组件
+│   └── ui/               # UI 基础组件
+├── config/               # 配置文件
+├── lib/                  # 工具函数和库
+├── prisma/               # Prisma 数据库模型
+├── public/               # 静态资源
+├── styles/               # 全局样式
+└── types/                # TypeScript 类型定义
+```
 
-> **Warning**
-> This app is using the unstable releases for Next.js 13 and React 18. The new router and app dir is still in beta and not production-ready.
-> **Expect some performance hits when testing the dashboard**.
-> If you see something broken, you can ping me [@shadcn](https://twitter.com/shadcn).
+## 🚀 快速开始
 
-## Features
+### 1. 克隆项目
 
-- New `/app` dir,
-- Routing, Layouts, Nested Layouts and Layout Groups
-- Data Fetching, Caching and Mutation
-- Loading UI
-- Route handlers
-- Metadata files
-- Server and Client Components
-- API Routes and Middlewares
-- Authentication using **NextAuth.js**
-- ORM using **Prisma**
-- Database on **PlanetScale**
-- UI Components built using **Radix UI**
-- Documentation and blog using **MDX** and **Contentlayer**
-- Subscriptions using **Stripe**
-- Styled using **Tailwind CSS**
-- Validations using **Zod**
-- Written in **TypeScript**
+```bash
+git clone <your-repo-url>
+cd next-template
+```
 
-## Roadmap
+### 2. 安装依赖
 
-- [x] ~Add MDX support for basic pages~
-- [x] ~Build marketing pages~
-- [x] ~Subscriptions using Stripe~
-- [x] ~Responsive styles~
-- [x] ~Add OG image for blog using @vercel/og~
-- [x] Dark mode
-
-## Known Issues
-
-A list of things not working right now:
-
-1. ~GitHub authentication (use email)~
-2. ~[Prisma: Error: ENOENT: no such file or directory, open '/var/task/.next/server/chunks/schema.prisma'](https://github.com/prisma/prisma/issues/16117)~
-3. ~[Next.js 13: Client side navigation does not update head](https://github.com/vercel/next.js/issues/42414)~
-4. [Cannot use opengraph-image.tsx inside catch-all routes](https://github.com/vercel/next.js/issues/48162)
-
-## Why not tRPC, Turborepo or X?
-
-I might add this later. For now, I want to see how far we can get using Next.js only.
-
-If you have some suggestions, feel free to create an issue.
-
-## Running Locally
-
-1. Install dependencies using pnpm:
-
-```sh
+```bash
 pnpm install
 ```
 
-2. Copy `.env.example` to `.env.local` and update the variables.
+### 3. 配置环境变量
 
-```sh
-cp .env.example .env.local
+复制 `.env.example` 文件并重命名为 `.env`：
+
+```bash
+cp .env.example .env
 ```
 
-3. Start the development server:
+配置以下环境变量：
 
-```sh
+```env
+# 数据库
+DATABASE_URL="mysql://user:password@localhost:3306/database"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+
+# GitHub OAuth
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+
+# Stripe
+STRIPE_API_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+STRIPE_PRO_MONTHLY_PLAN_ID="price_..."
+
+# 邮件
+SMTP_FROM="noreply@your-domain.com"
+RESEND_API_KEY="re_..."
+
+# 应用
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
+
+### 4. 初始化数据库
+
+```bash
+pnpm prisma db push
+```
+
+### 5. 启动开发服务器
+
+```bash
 pnpm dev
 ```
 
-## License
+访问 [http://localhost:3000](http://localhost:3000) 查看应用。
 
-Licensed under the [MIT license](https://github.com/shadcn/taxonomy/blob/main/LICENSE.md).
+## 📝 配置说明
+
+### 网站配置
+
+编辑 `config/site.ts` 文件来自定义网站信息：
+
+```ts
+export const siteConfig: SiteConfig = {
+  name: "Your App Name",
+  description: "Your app description",
+  url: "https://your-domain.com",
+  // ...
+}
+```
+
+### 订阅计划
+
+编辑 `config/subscriptions.ts` 来配置订阅计划：
+
+```ts
+export const freePlan: SubscriptionPlan = {
+  name: "Free",
+  description: "Free plan description",
+  stripePriceId: "",
+}
+
+export const proPlan: SubscriptionPlan = {
+  name: "Pro",
+  description: "Pro plan description",
+  stripePriceId: env.STRIPE_PRO_MONTHLY_PLAN_ID,
+}
+```
+
+## 🔧 自定义开发
+
+### 添加新页面
+
+在 `app/` 目录下创建新的路由文件夹和 `page.tsx` 文件。
+
+### 添加新组件
+
+在 `components/` 目录下创建新组件，UI 基础组件放在 `components/ui/` 目录。
+
+### 修改数据库模型
+
+1. 编辑 `prisma/schema.prisma`
+2. 运行 `pnpm prisma db push` 同步数据库
+3. 运行 `pnpm prisma generate` 更新 Prisma Client
+
+## 📦 部署
+
+### Vercel 部署
+
+1. 将代码推送到 GitHub
+2. 在 Vercel 导入项目
+3. 配置环境变量
+4. 部署
+
+### 数据库
+
+推荐使用 [PlanetScale](https://planetscale.com/) 或 [Neon](https://neon.tech/) 作为生产数据库。
+
+## 📄 许可证
+
+MIT License - 详见 [LICENSE.md](LICENSE.md)
