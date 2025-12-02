@@ -47,6 +47,7 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
+  password      String?
   image         String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @default(now()) @map(name: "updated_at")
@@ -59,6 +60,12 @@ model User {
   stripePriceId          String?   @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
 
+  // AI Drawing credits
+  freeCredits Int @default(10) @map(name: "free_credits")
+
+  // Relations
+  imageGenerations ImageGeneration[]
+
   @@map(name: "users")
 }
 
@@ -69,4 +76,50 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map(name: "verification_tokens")
+}
+
+// AI Drawing Models
+model ImageGeneration {
+  id        String   @id @default(cuid())
+  userId    String? // Nullable for guest users
+  sessionId String   @map(name: "session_id") // Track guest sessions
+  prompt    String   @db.Text
+  style     String?
+  model     String? // API model name used for generation
+  imageUrl  String?  @map(name: "image_url") @db.LongText
+  status    String   @default("pending") // pending, generating, completed, failed
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+
+  user     User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map(name: "image_generations")
+}
+
+model ChatMessage {
+  id           String   @id @default(cuid())
+  generationId String   @map(name: "generation_id")
+  role         String // user, assistant
+  content      String   @db.Text
+  imageUrl     String?  @map(name: "image_url") @db.LongText
+  createdAt    DateTime @default(now()) @map(name: "created_at")
+
+  generation ImageGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@index([generationId])
+  @@map(name: "chat_messages")
+}
+
+// Guest session tracking for free credits
+model GuestSession {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique @map(name: "session_id")
+  freeCredits Int      @default(3) @map(name: "free_credits")
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @default(now()) @map(name: "updated_at")
+
+  @@map(name: "guest_sessions")
 }

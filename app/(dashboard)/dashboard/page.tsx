@@ -26,7 +26,13 @@ export default async function DashboardPage() {
     redirect(authOptions?.pages?.signIn || "/login")
   }
 
-  const subscriptionPlan = await getUserSubscriptionPlan(user.id)
+  let subscriptionPlan
+  try {
+    subscriptionPlan = await getUserSubscriptionPlan(user.id)
+  } catch (error) {
+    // If user exists in session but not in DB, redirect to login
+    redirect("/login")
+  }
 
   return (
     <DashboardShell>
