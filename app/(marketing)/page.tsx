@@ -6,6 +6,7 @@ import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { AIPainter } from "@/components/ai-painter"
+import { Pricing } from "@/components/pricing"
 
 export default async function IndexPage() {
   const session = await getServerSession(authOptions)
@@ -40,6 +41,7 @@ export default async function IndexPage() {
         id="features"
         className="container space-y-6 py-8 md:py-12 lg:py-24"
       >
+        {/* ... existing features ... */}
         <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
           <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-5xl">
             Powerful Features
@@ -49,6 +51,7 @@ export default async function IndexPage() {
           </p>
         </div>
         <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+          {/* ... existing feature cards ... */}
           <div className="relative overflow-hidden rounded-xl border bg-background p-2">
             <div className="flex h-[180px] flex-col justify-between rounded-lg p-6">
               <svg
@@ -193,6 +196,9 @@ export default async function IndexPage() {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <Pricing />
 
       {/* CTA Section */}
       <section className="container py-8 md:py-12 lg:py-24">
